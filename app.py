@@ -2,15 +2,27 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-@app.route("/api/produtos", methods=["POST"])
-def adicionar_produto():
-    dados = request.get_json()
-    nome = dados.get("nome")
+LISTA_PRODUTOS = []
 
-    return jsonify({
-        "status" : "sucesso",
-        "mensagem": f"Produto {nome} recebido!"
-        }), 201
+@app.route("/api/produtos", methods=["POST"])
+def cadastrar():
+    dados = request.get_json()
+    
+    if not dados or "nome" not in dados or "preco" not in dados:
+        return jsonify({
+            "erro": "DADOS_INCOMPLETOS",
+            "mensagem": "Os campos 'nome' e 'preco' são obrigatórios."
+        }), 400
+
+    novo_item = {
+        "id" : len(LISTA_PRODUTOS) + 1,
+        "nome" : dados["nome"],
+        "preco" : dados["preco"]
+    }
+
+    LISTA_PRODUTOS.append(novo_item)
+
+    return jsonify(novo_item), 201
 
 
 if __name__ == "__main__":
